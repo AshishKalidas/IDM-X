@@ -4,8 +4,7 @@
   "version": "0.1.0",
   "identifier": "app.idmx.desktop",
   "build": {
-    "frontendDist": "../ui/dist",
-    "beforeBuildCommand": "npm --prefix ../ui run build"
+    "frontendDist": "../ui/dist"
   },
   "app": {
     "withGlobalTauri": false,

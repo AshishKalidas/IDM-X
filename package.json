@@ -5,7 +5,7 @@
   "scripts": {
     "ui": "npm --prefix ui run build",
     "app:dev": "npm --prefix ui run build && cargo run -p idmx-app",
-    "app:build": "tauri build",
+    "app:build": "npm --prefix ui run build && tauri build",
     "cli": "cargo run -q -p idmx-cli --",
     "test": "cargo test --workspace && npm --prefix ui run typecheck"
   },
