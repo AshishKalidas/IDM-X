@@ -35,8 +35,8 @@ jobs:
         run: cargo build --release -p idmx-cli --target ${{ matrix.target }}
       - name: Build the desktop app (installer)
         run: |
-          npx tauri build --target ${{ matrix.target }} --config src-tauri/tauri.conf.json
-        working-directory: .
+          ../node_modules/.bin/tauri build --target ${{ matrix.target }}
+        working-directory: src-tauri
       - name: Collect files
         shell: bash
         run: |
