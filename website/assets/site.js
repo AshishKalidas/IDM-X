@@ -309,6 +309,7 @@
     card('macos-arm64', D['macos-arm64'], isMac),
     card('macos-x64', D['macos-x64'], false),
     card('windows', D.windows, isWin),
+    card('linux', D.linux, /Linux/.test(navigator.userAgent) && !/Android/.test(navigator.userAgent)),
     `<h4>Command line</h4>`,
     card('cli-mac', D['cli-mac']), card('cli-mac-x64', D['cli-mac-x64']), card('cli-win', D['cli-win']), card('cli-linux', D['cli-linux']),
   ].join('')
