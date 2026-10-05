@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <title>IDMX</title>
+    <link rel="icon" type="image/png" href="./idmx-logo.png" />
+    <script>
+      // Resolve the theme before first paint so there is never a flash of the wrong background.
+      try {
+        var pref = localStorage.getItem('idmx.theme') || 'system'
+        var dark = pref === 'dark' || (pref === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+        document.documentElement.style.background = dark ? '#000' : '#fff'
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

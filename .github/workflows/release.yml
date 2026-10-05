@@ -1,0 +1,56 @@
+# Builds the installers and CLI for macOS, Windows and Linux when you push a version tag (git tag v0.1.0 && git push --tags)
+# and attaches them to a GitHub release, so the website's download buttons have real files to point at.
+name: release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-14, target: aarch64-apple-darwin, name: macos-arm64 }
+          - { os: macos-13, target: x86_64-apple-darwin, name: macos-x64 }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc, name: windows-x64 }
+          - { os: ubuntu-22.04, target: x86_64-unknown-linux-gnu, name: linux-x64 }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with: { targets: '${{ matrix.target }}' }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Linux build dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+      - name: Build the UI
+        run: npm --prefix ui ci && npm --prefix ui run build
+      - name: Build the command-line tool
+        run: cargo build --release -p idmx-cli --target ${{ matrix.target }}
+      - name: Build the desktop app (installer)
+        run: |
+          npm --prefix ui exec -- tauri build --target ${{ matrix.target }} --config src-tauri/tauri.conf.json
+        working-directory: .
+      - name: Collect files
+        shell: bash
+        run: |
+          V="${GITHUB_REF_NAME#v}"; [ -z "$V" ] && V=dev
+          mkdir out
+          B=target/${{ matrix.target }}/release/bundle
+          case "${{ matrix.name }}" in
+            macos-*) cp $B/dmg/*.dmg "out/IDMX-$V-${{ matrix.name }}.dmg"
+                     tar -czf "out/idmx-$V-${{ matrix.name }}.tar.gz" -C target/${{ matrix.target }}/release idmx ;;
+            windows-x64) cp $B/nsis/*-setup.exe "out/IDMX-$V-windows-x64-setup.exe"
+                     7z a "out/idmx-$V-windows-x64.zip" ./target/${{ matrix.target }}/release/idmx.exe ;;
+            linux-x64) cp $B/appimage/*.AppImage "out/IDMX-$V-linux-x64.AppImage"
+                     cp $B/deb/*.deb "out/IDMX-$V-linux-x64.deb"
+                     tar -czf "out/idmx-$V-linux-x64.tar.gz" -C target/${{ matrix.target }}/release idmx ;;
+          esac
+      - uses: softprops/action-gh-release@v2
+        with: { files: 'out/*', draft: false }

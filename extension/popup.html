@@ -1,0 +1,25 @@
+<!doctype html>
+<meta charset="utf-8" />
+<style>
+  :root { color-scheme: light dark; }
+  body { margin: 0; width: 340px; font: 13px -apple-system, system-ui, sans-serif; background: Canvas; color: CanvasText; }
+  header { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid #8884; }
+  header b { font-size: 15px; flex: 1; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #888; }
+  .dot.on { background: #30d158; box-shadow: 0 0 8px #30d158; }
+  main { padding: 10px 14px; }
+  button { font: 600 12px inherit; border: 0; border-radius: 8px; padding: 7px 12px; background: #0a84ff; color: #fff; cursor: pointer; }
+  button.ghost { background: #8883; color: inherit; }
+  .row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #8882; }
+  .row span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  small { color: #8a8a8e; }
+  #msg { padding: 8px 0; color: #8a8a8e; }
+</style>
+<header><i class="dot" id="dot"></i><b>IDMX</b><a href="options.html" target="_blank" style="color:#8a8a8e">Settings</a></header>
+<main>
+  <div id="page" class="row" hidden><span>This page’s video</span><select id="q"></select><button id="pageBtn">Grab</button></div>
+  <div id="list"></div>
+  <div id="msg"></div>
+</main>
+<script src="sniff.js"></script>
+<script src="popup.js"></script>

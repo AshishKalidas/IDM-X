@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "IDMX \u2014 grab downloads, video & torrents",
+  "version": "0.2.0",
+  "description": "Send links and downloads to the IDMX app, with your logged-in cookies, so every network you have pulls them at once.",
+  "permissions": [
+    "activeTab",
+    "alarms",
+    "contextMenus",
+    "cookies",
+    "downloads",
+    "nativeMessaging",
+    "notifications",
+    "scripting",
+    "storage",
+    "tabs",
+    "webNavigation",
+    "webRequest"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "http://127.0.0.1/*",
+    "http://localhost/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_page": "options.html",
+  "action": {
+    "default_title": "IDMX",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "128": "icon.png"
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqhOE2w44ypTY9O9JjdcdWQ9Y6nhq32Oe3h9jWrHGccAgMVZDuN63e+ds+7WWJ5LUToI74sclLdccctVKGo+ffkzKG5bWyH23gIWJDKc76P8l4BiRW/hlOUjzdRDsDFb6Dhg7HOv1ofD0EHLH8JQ8kvSvN+6I6RPgvbORHYr/PfdXNjQK/JzU/O0sGBN44FO0z7XUYhGbgjy9UFVhrEu+xnL2QA6JMGODLf5G+K/U/qUNVPzGoPcCOeakYcMOU09pLHJlkRGkBoSi+dSuZXNXZk/zPg456S6FuiipKMXMHoEDT2SgLo3Za1KUXP9aWXF6c6n4KnncluZZ90s4VEY65QIDAQAB",
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "sniff.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

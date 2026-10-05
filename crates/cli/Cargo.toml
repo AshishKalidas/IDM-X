@@ -1,0 +1,23 @@
+[package]
+name = "idmx-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "idmx"
+path = "src/main.rs"
+
+[dependencies]
+idmx-core.workspace = true
+idmx-server.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing-subscriber.workspace = true
+clap = { version = "4", features = ["derive", "env"] }
+crossterm = "0.29"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json", "stream"] }
+futures-util.workspace = true
+chrono = "0.4"
+anyhow.workspace = true

@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IDMX — every connection you have, one download</title>
+  <meta name="description" content="IDMX downloads a file over Wi-Fi, Ethernet, your phone's hotspot and cellular at the same time. Torrents, video from thousands of sites, a browser extension and a full command line. Developed by XSHLABS." />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="assets/favicon.png" type="image/png" />
+  <meta property="og:image" content="assets/logo.png" />
+  <script>
+    // Apply the saved or system theme before first paint so there's no flash.
+    try {
+      var t = localStorage.getItem('idmx.site.theme')
+      if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+      document.documentElement.dataset.theme = t
+    } catch (e) { document.documentElement.dataset.theme = 'dark' }
+  </script>
+  <link rel="stylesheet" href="assets/tokens.css" />
+  <link rel="stylesheet" href="assets/site.css" />
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+
+  <header class="nav" id="nav">
+    <a class="brand" href="#top" aria-label="IDMX home">
+      <img src="assets/logo.png" width="30" height="30" alt="" class="brand-mark" />
+      <span>IDMX</span>
+    </a>
+    <nav class="links" aria-label="Sections">
+      <a href="#problem">Why</a>
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#cli">CLI</a>
+      <a href="#mobile">Mobile</a>
+      <a href="#releases">Releases</a>
+    </nav>
+    <div class="nav-right">
+      <button class="icon-btn" id="theme" aria-label="Toggle light and dark">
+        <svg class="i-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="i-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <a class="btn primary sm" href="#download" data-dl-cta>Download</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ───────── hero ───────── -->
+    <section class="hero">
+      <canvas id="hero-canvas" aria-hidden="true"></canvas>
+      <div class="hero-copy">
+        <h1 class="reveal" style="--d:.05s">Every connection you have.<br /><span class="grad">One download.</span></h1>
+        <p class="lede reveal" style="--d:.12s">IDMX pulls a single file over Wi-Fi, Ethernet, your phone's hotspot and cellular <em>at the same time</em> — then puts it back together. Torrents, video from thousands of sites and a browser extension come built in.</p>
+        <div class="cta reveal" style="--d:.2s">
+          <a class="btn primary lg" href="#download" data-dl-cta><span data-dl-label>Download IDMX</span></a>
+          <a class="btn glass lg" href="#how">See how it works</a>
+        </div>
+        <p class="fine reveal" style="--d:.26s" id="hero-fine">Free · No account · Nothing leaves your computer</p>
+      </div>
+      <div class="hero-shot reveal tilt" style="--d:.3s" data-tilt>
+        <div class="window">
+          <div class="chrome"><i></i><i></i><i></i><span>IDMX</span></div>
+          <img class="shot" data-shot="downloads" alt="IDMX downloading one file across three networks at once" width="1440" height="900" />
+        </div>
+      </div>
+    </section>
+
+    <section class="strip reveal">
+      <div><b data-count="4" data-suffix="+">0</b><span>network types at once<br /><small>Wi-Fi · Ethernet · tether · cellular</small></span></div>
+      <div><b data-count="3">0</b><span>kinds of download<br /><small>files · torrents · video</small></span></div>
+      <div><b data-count="0" data-text="0 B">0</b><span>sent to anyone<br /><small>no account, no telemetry</small></span></div>
+      <div><b data-count="1">0</b><span>engine, three front doors<br /><small>app · browser · terminal</small></span></div>
+    </section>
+
+    <!-- ───────── problem ───────── -->
+    <section class="section" id="problem">
+      <div class="head reveal">
+        <p class="eyebrow">The problem</p>
+        <h2>You're paying for more internet<br />than any download uses.</h2>
+        <p class="sub">Your laptop is on Wi-Fi. Your phone has a data plan. There may be an Ethernet port, too. A normal download uses exactly one of them and leaves the rest idle — so the slowest link sets your pace, and one hiccup stalls the whole thing.</p>
+      </div>
+
+      <div class="race reveal" id="race">
+        <div class="race-ctl">
+          <p class="mono dim">Try it — switch connections on and off</p>
+          <div class="race-chips" id="race-chips"></div>
+          <label class="race-file">File size
+            <input type="range" id="race-size" min="1" max="50" value="8" />
+            <output id="race-size-out" class="mono">8 GB</output>
+          </label>
+        </div>
+        <div class="race-lanes">
+          <div class="lane"><div class="lane-h"><span>Any normal downloader</span><b class="mono" id="race-a-time">—</b></div><div class="bar"><i id="race-a"></i></div></div>
+          <div class="lane hot"><div class="lane-h"><span>IDMX</span><b class="mono" id="race-b-time">—</b></div><div class="bar multi" id="race-b"></div></div>
+          <div class="race-foot"><span class="mono" id="race-speed">—</span><button class="btn glass sm" id="race-go">Run again</button></div>
+        </div>
+        <p class="fine">Illustrative simulation using the speeds shown. Real results depend on your connections — and on them being separate (two things on the same router share one uplink; IDMX tells you when it sees that).</p>
+      </div>
+
+      <div class="cards3">
+        <article class="card reveal"><h3>One link, one ceiling</h3><p>Browsers and most download managers open every connection on the same network. Faster Wi-Fi is the only way to go faster.</p></article>
+        <article class="card reveal" style="--d:.08s"><h3>Slow servers, slow you</h3><p>Plenty of servers throttle each connection. One socket on one network means you never reach what your line can actually do.</p></article>
+        <article class="card reveal" style="--d:.16s"><h3>Fragile by default</h3><p>A dropped connection, a sleeping laptop, a Wi-Fi switch — and the download starts over. Big files deserve better.</p></article>
+      </div>
+    </section>
+
+    <!-- ───────── how ───────── -->
+    <section class="section" id="how">
+      <div class="head reveal">
+        <p class="eyebrow">How it solves it</p>
+        <h2>Cut the file up. Send every piece<br />down a different road.</h2>
+      </div>
+      <div class="how">
+        <ol class="steps">
+          <li class="step reveal" data-step="0"><span class="n mono">01</span><div><h3>Find every way out</h3><p>IDMX lists your network adapters and works out which are Wi-Fi, Ethernet, a tethered phone or cellular, and which are actually online.</p></div></li>
+          <li class="step reveal" data-step="1"><span class="n mono">02</span><div><h3>Bind, don't hope</h3><p>Each connection is tied to one specific network at the operating-system level, so traffic really leaves through that road — not whichever one your computer prefers.</p></div></li>
+          <li class="step reveal" data-step="2"><span class="n mono">03</span><div><h3>Split into blocks</h3><p>The file is divided into small blocks. Free connections grab the next one; a fast network naturally takes more, a slow one fewer. The last stretch is raced so a laggard can't hold you up.</p></div></li>
+          <li class="step reveal" data-step="3"><span class="n mono">04</span><div><h3>Reassemble &amp; verify</h3><p>Blocks land in the right place on disk, the file is checked against its checksum when one is published, and a download that was interrupted simply resumes.</p></div></li>
+        </ol>
+        <div class="viz reveal">
+          <canvas id="blocks" aria-label="Animation of a file being filled in by three networks"></canvas>
+          <div class="legend"><span><i style="background:var(--net-wifi)"></i>Wi-Fi</span><span><i style="background:var(--net-tether)"></i>Phone hotspot</span><span><i style="background:var(--net-cellular)"></i>Cellular</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── features ───────── -->
+    <section class="section" id="features">
+      <div class="head reveal">
+        <p class="eyebrow">Features</p>
+        <h2>Everything a download manager should be.<br />Nothing it shouldn't.</h2>
+        <p class="sub">Real screenshots from the app. Dark mode is true black for OLED screens; light mode is true white.</p>
+      </div>
+
+      <div class="showcase reveal">
+        <div class="tabs" role="tablist" id="tabs">
+          <button role="tab" class="on" data-tab="downloads">Downloads</button>
+          <button role="tab" data-tab="networks">Networks</button>
+          <button role="tab" data-tab="torrents">Torrents</button>
+          <button role="tab" data-tab="speedtest">Speed test</button>
+          <button role="tab" data-tab="automation">Automation</button>
+          <button role="tab" data-tab="add">New download</button>
+          <button role="tab" data-tab="settings">Settings</button>
+        </div>
+        <div class="tab-body">
+          <div class="window big">
+            <div class="chrome"><i></i><i></i><i></i><span id="tab-title">Downloads</span></div>
+            <img class="shot" id="showcase-img" data-shot="downloads" alt="" width="1440" height="900" />
+          </div>
+          <div class="tab-copy" id="tab-copy"></div>
+        </div>
+        <p class="fine">Screenshots show a demo run with <b>simulated</b> extra networks, because a single Mac only has one real connection to show.</p>
+      </div>
+
+      <div class="grid">
+        <article class="feat reveal"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><h3>Multi-network engine</h3><p>Wi-Fi + Ethernet + hotspot + cellular, each pinned to its own road, balanced by how fast each one really is.</p></article>
+        <article class="feat reveal" style="--d:.05s"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 17.5h7M17.5 14v7"/></svg></div><h3>Block-level splitting</h3><p>Dozens of parts of one file download at once, with live per-connection detail and a map of who delivered what.</p></article>
+        <article class="feat reveal" style="--d:.1s"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="m5.6 5.6 3.9 3.9M14.5 14.5l3.9 3.9M18.4 5.6l-3.9 3.9M9.5 14.5l-3.9 3.9"/></svg></div><h3>Self-healing</h3><p>Unplug a cable, walk out of Wi-Fi range, close the lid — IDMX re-routes, retries and resumes without starting over.</p></article>
+        <article class="feat reveal" style="--d:.15s"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 4v5M16 4v5M10.5 13.5l3.5 2-3.5 2z"/></svg></div><h3>Video from thousands of sites</h3><p>Pick Low 480p, Med 720p or High 1080p — or audio as MP3 at 216 or 320 kbps. Powered by yt-dlp running on your own computer.</p></article>
+        <article class="feat reveal" style="--d:.2s"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v8a6 6 0 0 0 12 0V3"/><path d="M6 7h4M14 7h4"/></svg></div><h3>Torrents</h3><p>Magnet links and .torrent files, with a file picker, seeding limits, and multi-file torrents divided across your networks.</p></article>
+        <article class="feat reveal" style="--d:.25s"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg></div><h3>Browser extension</h3><p>Grabs links, videos and magnets for you — a download button appears over videos and the extension pairs itself with the app.</p></article>
+        <article class="feat reveal" style="--d:.3s"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></div><h3>Use your phone</h3><p>Plug in an iPhone or Android over USB and its data becomes one more road. Per-network data caps keep your plan safe.</p></article>
+        <article class="feat reveal" style="--d:.35s"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div><h3>Automation</h3><p>Schedules, a speed limit, post-download rules (move, extract, run), sleep when the queue is empty.</p></article>
+        <article class="feat reveal" style="--d:.4s"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg></div><h3>Private by design</h3><p>No account, no analytics, no cloud. The API is token-locked even on your own machine.</p></article>
+      </div>
+    </section>
+
+    <!-- ───────── video + extension ───────── -->
+    <section class="section" id="grab">
+      <div class="split">
+        <div class="reveal">
+          <p class="eyebrow">Browser extension</p>
+          <h2>Stop copying links.</h2>
+          <p class="sub">Install the extension once. A <b>⬇ IDMX</b> chip appears over any video — hover it for quality choices. Magnet links and .torrent files open straight in IDMX, and your logged-in session comes along so private downloads just work.</p>
+          <ul class="ticks">
+            <li>Finds streams on the page and counts them on the toolbar icon</li>
+            <li>Pairs itself with the app — no token to copy</li>
+            <li>Chrome, Edge, Brave, Vivaldi, Arc and other Chromium browsers</li>
+          </ul>
+        </div>
+        <div class="reveal" style="--d:.1s">
+          <div class="mock-video">
+            <div class="mock-screen"><div class="play"></div>
+              <div class="chip-demo"><span class="chip">⬇ IDMX</span>
+                <div class="menu"><b>Low · 480p</b><b>Med · 720p</b><b class="sel">High · 1080p</b><b>Audio · 216 kbps</b><b>Audio · 320 kbps</b></div>
+              </div>
+            </div>
+            <p class="fine">Illustration of the hover menu.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── CLI ───────── -->
+    <section class="section" id="cli">
+      <div class="head reveal">
+        <p class="eyebrow">For the terminal</p>
+        <h2>The whole engine, one command away.</h2>
+        <p class="sub">The same multi-network engine runs headless as <code>idmx</code>. Script it, run it on a server, drive it over SSH — or control the desktop app from any terminal.</p>
+      </div>
+      <div class="cli">
+        <div class="term reveal">
+          <div class="chrome"><i></i><i></i><i></i><span>zsh — idmx</span></div>
+          <pre id="term" class="mono" aria-label="Example terminal session"></pre>
+        </div>
+        <div class="cli-side reveal" style="--d:.1s">
+          <div class="cmdtabs" id="cmdtabs">
+            <button class="on" data-c="install">Install</button><button data-c="get">Download</button><button data-c="video">Video</button><button data-c="torrent">Torrent</button><button data-c="daemon">Server</button>
+          </div>
+          <div class="cmdbox"><code id="cmd" class="mono"></code><button class="btn glass sm" id="copy">Copy</button></div>
+          <ul class="ticks">
+            <li><code>idmx nets</code> — your networks with live ping</li>
+            <li><code>idmx get --json</code> — machine-readable progress for scripts</li>
+            <li><code>idmx daemon</code> — headless engine with a web dashboard</li>
+            <li><code>idmx ls · pause · resume · net</code> — control a running instance</li>
+          </ul>
+          <p class="fine">Install from source: the script builds a release binary and copies it to <code>/usr/local/bin</code>. Prebuilt CLI binaries are listed in <a href="#download">Downloads</a> once published.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── mobile ───────── -->
+    <section class="section" id="mobile">
+      <div class="mobile reveal">
+        <div class="phones" aria-hidden="true">
+          <div class="phone p1"><div class="notch"></div><div class="ph-screen"><b class="mono">8.5 MB/s</b><i class="b1"></i><i class="b2"></i><i class="b3"></i></div></div>
+          <div class="phone p2"><div class="notch"></div><div class="ph-screen"><b class="mono">Wi-Fi + 5G</b><i class="b1"></i><i class="b2"></i></div></div>
+        </div>
+        <div>
+          <p class="eyebrow"><span class="soon">Coming soon</span> Mobile</p>
+          <h2>Wi-Fi and mobile data. Together. In your pocket.</h2>
+          <p class="sub">We're bringing the multi-network engine to Android and iOS, so a phone can pull a file over Wi-Fi and cellular at once. It's early work — nothing to download yet.</p>
+          <p class="fine">Until then, your phone already works as a connection for the desktop app — plug it in over USB — and the app's web dashboard can be opened on a phone to watch or add downloads.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── download ───────── -->
+    <section class="section" id="download">
+      <div class="head reveal">
+        <p class="eyebrow">Download</p>
+        <h2>Get IDMX <span data-latest>0.1.0</span></h2>
+        <p class="sub" id="dl-sub">Free. No account. Pick your system.</p>
+      </div>
+      <div class="dls" id="dls"></div>
+      <div class="notes reveal">
+        <div><h4>First launch on macOS</h4><p>Open the downloaded file and drag IDMX into Applications. Builds aren't notarized by Apple yet, so the first time, <b>right-click IDMX → Open</b> and confirm. After that it opens normally.</p></div>
+        <div><h4>First launch on Windows</h4><p>Windows SmartScreen may warn about an unrecognised app. Choose <b>More info → Run anyway</b>. Everything stays on your computer.</p></div>
+        <div><h4>Browser extension</h4><p>Not in the Chrome Web Store yet. IDMX unpacks it for you. Open your browser's extensions page, switch on Developer mode, click <b>Show extension folder</b> in IDMX, then <b>drag the highlighted folder onto the page</b> (or choose <b>Load unpacked</b>). That's it.</p></div>
+      </div>
+    </section>
+
+    <!-- ───────── releases ───────── -->
+    <section class="section" id="releases">
+      <div class="head reveal">
+        <p class="eyebrow">Release notes</p>
+        <h2>What's new.</h2>
+      </div>
+      <div class="timeline" id="timeline"></div>
+    </section>
+
+    <!-- ───────── faq ───────── -->
+    <section class="section narrow" id="faq">
+      <div class="head reveal"><p class="eyebrow">Questions</p><h2>Straight answers.</h2></div>
+      <div class="faq reveal" id="faq-list">
+        <details><summary>Will it make my internet faster?</summary><p>If you have more than one <b>separate</b> connection — say home Wi-Fi plus a phone on cellular — yes: the file comes down all of them at once. If your two connections share one router and one line, there's nothing extra to add, and IDMX says so instead of pretending.</p></details>
+        <details><summary>How do I add my phone's data?</summary><p><b>iPhone:</b> plug it in, then on the phone switch on Settings → Personal Hotspot → Allow Others to Join. <b>Android:</b> switch on USB tethering in the phone's hotspot settings — on a Mac you also need the free <a href="https://github.com/XiaoMiku01/TetherKit/releases/download/v0.1.5/TetherKit-v0.1.5-macos-arm64.zip" rel="noopener">TetherKit</a> helper (a direct download for Macs with Apple silicon), because macOS can't share an Android phone's data by itself. IDMX has a step-by-step guide with live status on its Networks page.</p></details>
+        <details><summary>Does it work with any website?</summary><p>The server needs to support range requests (almost all do). If it doesn't, IDMX falls back to a single connection and tells you why.</p></details>
+        <details><summary>Does streaming video (HLS/DASH) use every network?</summary><p>Not yet. Videos that are plain files do. Streamed ones are fetched segment-by-segment by yt-dlp, several segments at a time, on one network.</p></details>
+        <details><summary>Can a single-file torrent use two networks?</summary><p>No — that would need a custom BitTorrent client. Multi-file torrents are divided by file across your networks; a single big file uses one.</p></details>
+        <details><summary>Will it eat my mobile data?</summary><p>Only if you let it. Each network has its own rules: mark it metered, set a daily or monthly cap, a speed limit, or exclude it per download.</p></details>
+        <details><summary>Is anything sent to a server?</summary><p>No account, no analytics, no cloud. The only network traffic is your downloads, plus an optional check for a newer version.</p></details>
+        <details><summary>What about Linux?</summary><p>The engine and the command-line tool are built for it, but the desktop app has only been verified on macOS so far. Windows and Linux builds are type-checked and being tested.</p></details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot-in">
+      <div class="foot-brand">
+        <span class="brand-big">IDMX</span>
+        <p>Use every network you have.</p>
+        <p class="dev">Developed by <b>XSHLABS</b></p>
+      </div>
+      <nav><a href="#features">Features</a><a href="#cli">CLI</a><a href="#mobile">Mobile</a><a href="#download">Download</a><a href="#releases">Release notes</a></nav>
+      <p class="fine">© 2026 XSHLABS. MIT licensed.</p>
+    </div>
+  </footer>
+
+  <script type="application/json" id="release-data">
+  {
+    "latest": "0.1.0",
+    "downloads": {
+      "macos-arm64": { "label": "macOS", "sub": "Apple silicon (M1 and later)", "file": "downloads/IDMX-0.1.0-macos-arm64.dmg" },
+      "macos-x64":   { "label": "macOS", "sub": "Intel", "file": "downloads/IDMX-0.1.0-macos-x64.dmg" },
+      "windows":     { "label": "Windows", "sub": "Windows 10 and 11, 64-bit", "file": "downloads/IDMX-0.1.0-windows-x64-setup.exe" },
+      "cli-mac":     { "label": "CLI · macOS", "sub": "idmx for the terminal · Apple silicon", "file": "downloads/idmx-0.1.0-macos-arm64.tar.gz" },
+      "cli-mac-x64": { "label": "CLI · macOS", "sub": "idmx for the terminal · Intel", "file": "downloads/idmx-0.1.0-macos-x64.tar.gz" },
+      "cli-win":     { "label": "CLI · Windows", "sub": "idmx.exe", "file": "downloads/idmx-0.1.0-windows-x64.zip" },
+      "cli-linux":   { "label": "CLI · Linux", "sub": "x86-64", "file": "downloads/idmx-0.1.0-linux-x64.tar.gz" }
+    },
+    "releases": [
+      {
+        "version": "0.1.0", "date": "2026-10-04", "title": "The first release",
+        "blurb": "IDMX arrives: one engine that downloads over every network you have, with torrents, video and a browser extension.",
+        "groups": [
+          { "name": "New", "items": [
+            "Multi-network downloading: Wi-Fi, Ethernet, tethered phone and cellular at once, each pinned to its own network",
+            "Block-level splitting with live per-connection view, block map and per-network attribution",
+            "Resume that survives restarts, network changes and sleep; hedged requests for the slow tail",
+            "Torrents: magnet links and .torrent files, file picker, seeding limits; multi-file torrents divided across networks",
+            "Video from thousands of sites via yt-dlp: Low 480p, Med 720p, High 1080p, MP3 at 216 or 320 kbps",
+            "Browser extension that finds media, pairs itself with the app and sends your logged-in session",
+            "The idmx command line: get, add, ls, pause, resume, nets, net, info, tools, speedtest, daemon",
+            "Speed test that measures each network, then all together",
+            "Schedules, speed limits, per-network data caps and post-download rules",
+            "True-black OLED dark mode and true-white light mode"
+          ]},
+          { "name": "Known limits", "items": [
+            "Streaming video (HLS/DASH) runs through yt-dlp on one network",
+            "A single-file torrent can't be divided across networks",
+            "Builds are unsigned; the extension loads unpacked until it is in the Chrome Web Store",
+            "Windows and Linux have been type-checked but not yet run on real machines",
+            "Mobile apps are not available yet"
+          ]}
+        ]
+      }
+    ]
+  }
+  </script>
+  <script src="assets/site.js" defer></script>
+</body>
+</html>

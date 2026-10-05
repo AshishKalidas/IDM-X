@@ -1,0 +1,15 @@
+{
+  "name": "idmx",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "ui": "npm --prefix ui run build",
+    "app:dev": "npm --prefix ui run build && cargo run -p idmx-app",
+    "app:build": "tauri build",
+    "cli": "cargo run -q -p idmx-cli --",
+    "test": "cargo test --workspace && npm --prefix ui run typecheck"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

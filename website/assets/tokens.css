@@ -1,0 +1,76 @@
+/* Design tokens. Dark is pure black (OLED); light is pure white. Everything else is a
+   translucent layer on top of that, so the true background is never tinted. */
+
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --fg: #1d1d1f;
+  --fg-2: rgba(60, 60, 67, 0.64);
+  --fg-3: rgba(60, 60, 67, 0.38);
+  --line: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.16);
+  --fill: rgba(0, 0, 0, 0.035);
+  --fill-2: rgba(0, 0, 0, 0.06);
+  --fill-3: rgba(0, 0, 0, 0.1);
+  --glass: rgba(255, 255, 255, 0.78);
+  --scrim: rgba(255, 255, 255, 0.55);
+  --accent: #007aff;
+  --accent-fg: #ffffff;
+  --accent-soft: rgba(0, 122, 255, 0.1);
+  --ok: #1fa84f;
+  --warn: #e08600;
+  --bad: #e5301f;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-2: 0 2px 6px rgba(0, 0, 0, 0.06), 0 18px 48px rgba(0, 0, 0, 0.12);
+  --glow: 0;
+  --net-wifi: #007aff;
+  --net-ethernet: #1fa84f;
+  --net-cellular: #af52de;
+  --net-tether: #e08600;
+  --net-vpn: #5856d6;
+  --net-other: #8e8e93;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #000000;
+  --fg: #f5f5f7;
+  --fg-2: rgba(235, 235, 245, 0.62);
+  --fg-3: rgba(235, 235, 245, 0.3);
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.2);
+  --fill: rgba(255, 255, 255, 0.055);
+  --fill-2: rgba(255, 255, 255, 0.09);
+  --fill-3: rgba(255, 255, 255, 0.14);
+  --glass: rgba(24, 24, 27, 0.72);
+  --scrim: rgba(0, 0, 0, 0.6);
+  --accent: #0a84ff;
+  --accent-fg: #ffffff;
+  --accent-soft: rgba(10, 132, 255, 0.16);
+  --ok: #30d158;
+  --warn: #ff9f0a;
+  --bad: #ff453a;
+  --shadow-1: 0 0 0 0.5px rgba(255, 255, 255, 0.06);
+  --shadow-2: 0 0 0 0.5px rgba(255, 255, 255, 0.1), 0 24px 64px rgba(0, 0, 0, 0.8);
+  --glow: 1;
+  --net-wifi: #0a84ff;
+  --net-ethernet: #30d158;
+  --net-cellular: #bf5af2;
+  --net-tether: #ff9f0a;
+  --net-vpn: #5e5ce6;
+  --net-other: #8e8e93;
+}
+
+:root {
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'SF Mono', ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sidebar: 232px;
+  --titlebar: 52px;
+}

@@ -1,0 +1,9 @@
+target/
+node_modules/
+ui/dist/*
+!ui/dist/.gitkeep
+src-tauri/gen/
+*.idmx
+.DS_Store
+website/downloads/*
+!website/downloads/.gitkeep
