@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { api, bootstrap, openEvents, setToken } from './api'
-import type { AddRequest, BlockMap, GlobalStats, InterfaceInfo, Job, JobTick, ServerEvent, Settings, Snapshot, SpeedTestReport, StreamStat, UpdateInfo, ToolsStatus, ExtensionInfo } from './types'
+import type { AddRequest, BlockMap, GlobalStats, InterfaceInfo, Job, JobTick, ServerEvent, Settings, Snapshot, SpeedTestReport, EnduranceStatus, StreamStat, UpdateInfo, ToolsStatus, ExtensionInfo } from './types'
 
 export type Page = 'downloads' | 'torrents' | 'networks' | 'automation' | 'speed' | 'settings'
 export type Filter = 'all' | 'active' | 'queued' | 'done'
@@ -59,6 +59,7 @@ interface State {
   paletteOpen: boolean
   toasts: Toast[]
   speed: SpeedTestReport | null
+  endurance: EnduranceStatus | null
   theme: ThemePref
   dialog: (DialogOptions & { resolve: (ok: boolean) => void }) | null
 
@@ -112,6 +113,7 @@ export const useStore = create<State>((set, get) => ({
   paletteOpen: false,
   toasts: [],
   speed: null,
+  endurance: null,
   theme: (localStorage.getItem('idmx.theme') as ThemePref) || 'system',
   dialog: null,
 
@@ -251,6 +253,8 @@ function applyEvent(set: Set, get: () => State, e: ServerEvent) {
       return set({ interfaces: e.data })
     case 'settings':
       return set((s) => ({ settings: s.settings ? { ...e.data, remote: { ...e.data.remote, token: s.settings.remote.token } } : e.data }))
+    case 'endurance':
+      return set({ endurance: e.data })
     case 'speedTest':
       return set({ speed: e.data })
     case 'action':

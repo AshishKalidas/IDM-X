@@ -5,7 +5,8 @@ import { api } from '../lib/api'
 import { kindMeta, netColor } from '../lib/kinds'
 import { useStore } from '../lib/store'
 import NoConnections, { useOffline } from '../components/NoConnections'
-import { Button, Num, TextField } from '../components/ui'
+import { Button, Num, Segmented, TextField } from '../components/ui'
+import EnduranceTest from '../components/EnduranceTest'
 
 export default function SpeedTest() {
   const report = useStore((s) => s.speed)
@@ -13,6 +14,7 @@ export default function SpeedTest() {
   const toast = useStore((s) => s.toast)
   const [url, setUrl] = useState('')
   const [adv, setAdv] = useState(false)
+  const [mode, setMode] = useState<'quick' | 'deep'>('quick')
   const running = !!report && !report.done
   const offline = useOffline()
 
@@ -28,8 +30,16 @@ export default function SpeedTest() {
     <div className="page-pad">
       <header className="page-head" data-tauri-drag-region>
         <h1>Speed test</h1>
+        <Segmented value={mode} onChange={setMode} options={[{ value: 'quick', label: 'Quick' }, { value: 'deep', label: 'In-depth' }]} />
       </header>
       <div className="scroll">
+        {mode === 'deep' ? (
+          <>
+            {offline && <NoConnections compact />}
+            <EnduranceTest />
+          </>
+        ) : (
+        <>
         <p className="lede">Measures every network on its own, then all together, so you can see what combining them is actually worth — before you start a big download.</p>
 
         {offline && <NoConnections compact />}
@@ -111,6 +121,8 @@ export default function SpeedTest() {
               Together these networks reach <b>{report.combinedMbps?.toFixed(0)} Mbit/s</b> — {report.gain.toFixed(1)}× the best one alone. Real downloads depend on the server too; see the <b>Downloads</b> page for live numbers. (Added up separately they measure {report.sumMbps.toFixed(0)} Mbit/s.)
             </div>
           </motion.div>
+        )}
+        </>
         )}
       </div>
     </div>

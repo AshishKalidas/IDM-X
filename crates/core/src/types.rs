@@ -649,6 +649,83 @@ pub struct SpeedTestReport {
     pub warnings: Vec<String>,
 }
 
+/// One network's numbers over a whole in-depth speed test run.
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct EnduranceNet {
+    pub id: String,
+    pub label: String,
+    pub kind: Option<IfKind>,
+    /// Throughput over the last second.
+    pub mbps: f64,
+    pub avg_mbps: f64,
+    pub min_mbps: f64,
+    pub max_mbps: f64,
+    /// 5th percentile: the speed you get on a bad second.
+    pub low_mbps: f64,
+    pub rtt_ms: Option<f64>,
+    pub min_rtt_ms: Option<f64>,
+    pub avg_rtt_ms: Option<f64>,
+    pub p95_rtt_ms: Option<f64>,
+    pub max_rtt_ms: Option<f64>,
+    pub jitter_ms: Option<f64>,
+    /// Pings sent / not answered.
+    pub sent: u64,
+    pub lost: u64,
+    pub loss_pct: f64,
+    /// Most pings in a row that went unanswered.
+    pub longest_loss_run: u32,
+    /// Seconds with next to no data flowing.
+    pub stall_secs: u64,
+    pub errors: u64,
+    pub bytes: u64,
+    pub cycles: u32,
+    pub cycle_pct: f64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct EndurancePoint {
+    /// Seconds since the run started.
+    pub t: u64,
+    pub mbps: f64,
+    pub rtt_ms: Option<f64>,
+    pub lost: bool,
+}
+
+/// What a finished in-depth run left behind (also written next to the log as JSON).
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct EnduranceSummary {
+    pub name: String,
+    pub started_at: i64,
+    pub ended_at: i64,
+    pub duration_secs: u64,
+    pub url: String,
+    pub total_bytes: u64,
+    pub nets: Vec<EnduranceNet>,
+    pub notes: Vec<String>,
+    pub csv_path: String,
+    pub csv_bytes: u64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct EnduranceStatus {
+    pub running: bool,
+    pub phase: String,
+    pub started_at: i64,
+    pub elapsed_secs: u64,
+    pub cycle_bytes: u64,
+    pub total_bytes: u64,
+    pub log_bytes: u64,
+    pub nets: Vec<EnduranceNet>,
+    /// The last couple of minutes, for the live chart. The full history only goes to the log file.
+    pub recent: Vec<EndurancePoint>,
+    pub summary: Option<EnduranceSummary>,
+    pub warnings: Vec<String>,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateInfo {
@@ -740,6 +817,7 @@ pub enum Event {
     Interfaces(Vec<InterfaceInfo>),
     Settings(Box<Settings>),
     SpeedTest(SpeedTestReport),
+    Endurance(Box<EnduranceStatus>),
     Update(Option<UpdateInfo>),
     Tools(ToolsStatus),
     Extension(Option<ExtensionInfo>),

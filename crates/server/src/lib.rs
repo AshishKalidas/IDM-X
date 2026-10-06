@@ -143,6 +143,12 @@ pub async fn serve(engine: Engine, cfg: ServeConfig) -> Result<ServerHandle> {
         .route("/expand", post(expand))
         .route("/probe", post(probe))
         .route("/speedtest", post(speedtest))
+        .route("/endurance", get(endurance_status))
+        .route("/endurance/start", post(endurance_start))
+        .route("/endurance/stop", post(endurance_stop))
+        .route("/endurance/logs", get(endurance_logs))
+        .route("/endurance/logs/{name}", axum::routing::delete(endurance_delete))
+        .route("/endurance/logs/{name}/reveal", post(endurance_reveal))
         .route_layer(middleware::from_fn_with_state(app.clone(), auth));
 
     let cors = CorsLayer::new()
@@ -548,6 +554,48 @@ struct SpeedReq {
 async fn speedtest(State(app): State<App>, body: Option<Json<SpeedReq>>) -> Res<Json<Value>> {
     app.engine.speed_test(body.and_then(|b| b.0.url))?;
     Ok(Json(json!({ "started": true })))
+}
+
+#[derive(Deserialize, Default)]
+struct EnduranceReq {
+    url: Option<String>,
+    #[serde(default)]
+    nets: Vec<String>,
+}
+
+async fn endurance_start(State(app): State<App>, body: Option<Json<EnduranceReq>>) -> Res<Json<Value>> {
+    let r = body.map(|b| b.0).unwrap_or_default();
+    app.engine.endurance_start(r.url, r.nets)?;
+    Ok(Json(json!({ "started": true })))
+}
+
+async fn endurance_stop(State(app): State<App>) -> Json<Value> {
+    app.engine.endurance_stop();
+    Json(json!({ "stopping": true }))
+}
+
+async fn endurance_status(State(app): State<App>) -> Json<Value> {
+    Json(json!({ "status": app.engine.endurance_status() }))
+}
+
+async fn endurance_logs(State(app): State<App>) -> Json<Value> {
+    Json(json!({ "logs": app.engine.endurance_logs() }))
+}
+
+async fn endurance_delete(State(app): State<App>, ConnectInfo(peer): ConnectInfo<SocketAddr>, Path(name): Path<String>) -> Res<Json<Value>> {
+    if !is_local(&peer) {
+        return Err(forbidden_remote());
+    }
+    app.engine.endurance_delete_log(&name)?;
+    Ok(Json(json!({ "ok": true })))
+}
+
+async fn endurance_reveal(State(app): State<App>, ConnectInfo(peer): ConnectInfo<SocketAddr>, Path(name): Path<String>) -> Res<Json<Value>> {
+    if !is_local(&peer) {
+        return Err(forbidden_remote());
+    }
+    idmx_core::os::reveal(&app.engine.endurance_log_path(&name)?);
+    Ok(Json(json!({ "ok": true })))
 }
 
 // ───────────────────────────── the web UI ─────────────────────────────

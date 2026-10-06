@@ -1,7 +1,7 @@
 // One transport for every shell: the desktop app, a browser on this machine, and the LAN
 // dashboard all talk to the same HTTP API. Only how we *find* it differs.
 
-import type { BrowserState, MediaProbe, TorrentMeta, ToolsStatus, AddRequest, BlockMap, InterfaceInfo, Job, ProbeInfo, ServerEvent, Settings, Snapshot, InterfaceRule, StreamStat, UpdateInfo } from './types'
+import type { BrowserState, MediaProbe, TorrentMeta, ToolsStatus, AddRequest, BlockMap, InterfaceInfo, Job, ProbeInfo, ServerEvent, Settings, Snapshot, InterfaceRule, StreamStat, UpdateInfo, EnduranceStatus, EnduranceSummary } from './types'
 
 let base = ''
 let token = ''
@@ -124,6 +124,12 @@ export const api = {
   pendingAdd: () => call<{ items: string[] }>('GET', '/pending-add'),
   cache: () => call<{ bytes: number }>('GET', '/cache'),
   clearCache: () => call<{ freed: number; bytes: number }>('POST', '/cache/clear', {}),
+  enduranceStatus: () => call<{ status: EnduranceStatus | null }>('GET', '/endurance'),
+  enduranceStart: (url: string | undefined, nets: string[]) => call('POST', '/endurance/start', { url, nets }),
+  enduranceStop: () => call('POST', '/endurance/stop', {}),
+  enduranceLogs: () => call<{ logs: EnduranceSummary[] }>('GET', '/endurance/logs'),
+  enduranceReveal: (name: string) => call('POST', `/endurance/logs/${name}/reveal`, {}),
+  enduranceDelete: (name: string) => call('DELETE', `/endurance/logs/${name}`),
   speedtest: (url?: string) => call('POST', '/speedtest', { url }),
 }
 

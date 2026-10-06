@@ -379,6 +379,66 @@ export interface SpeedTestReport {
   warnings: string[]
 }
 
+export interface EnduranceNet {
+  id: string
+  label: string
+  kind: IfKind | null
+  mbps: number
+  avgMbps: number
+  minMbps: number
+  maxMbps: number
+  lowMbps: number
+  rttMs: number | null
+  minRttMs: number | null
+  avgRttMs: number | null
+  p95RttMs: number | null
+  maxRttMs: number | null
+  jitterMs: number | null
+  sent: number
+  lost: number
+  lossPct: number
+  longestLossRun: number
+  stallSecs: number
+  errors: number
+  bytes: number
+  cycles: number
+  cyclePct: number
+}
+
+export interface EndurancePoint {
+  t: number
+  mbps: number
+  rttMs: number | null
+  lost: boolean
+}
+
+export interface EnduranceSummary {
+  name: string
+  startedAt: number
+  endedAt: number
+  durationSecs: number
+  url: string
+  totalBytes: number
+  nets: EnduranceNet[]
+  notes: string[]
+  csvPath: string
+  csvBytes: number
+}
+
+export interface EnduranceStatus {
+  running: boolean
+  phase: string
+  startedAt: number
+  elapsedSecs: number
+  cycleBytes: number
+  totalBytes: number
+  logBytes: number
+  nets: EnduranceNet[]
+  recent: EndurancePoint[]
+  summary: EnduranceSummary | null
+  warnings: string[]
+}
+
 export interface AddRequest {
   urls: string[]
   destDir?: string | null
@@ -396,6 +456,7 @@ export type ServerEvent =
   | { type: 'interfaces'; data: InterfaceInfo[] }
   | { type: 'settings'; data: Settings }
   | { type: 'speedTest'; data: SpeedTestReport }
+  | { type: 'endurance'; data: EnduranceStatus }
   | { type: 'update'; data: UpdateInfo | null }
   | { type: 'tools'; data: ToolsStatus }
   | { type: 'extension'; data: ExtensionInfo | null }

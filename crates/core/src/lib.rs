@@ -14,6 +14,7 @@ mod pipeline_torrent;
 pub mod post;
 pub mod run;
 pub mod torrent;
+mod endurance;
 mod speedtest;
 pub mod store;
 pub mod types;

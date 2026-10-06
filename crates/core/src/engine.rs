@@ -80,6 +80,8 @@ pub(crate) struct Inner {
     pub had_work: AtomicBool,
     pub awake: Mutex<Option<os::AwakeGuard>>,
     pub speedtest_busy: AtomicBool,
+    pub endurance_stop: AtomicBool,
+    pub endurance_status: Mutex<Option<EnduranceStatus>>,
     /// Force sockets onto their device (off for tests that talk to loopback).
     pub bind_device: bool,
     /// Interfaces were supplied by the caller; don't poll the OS.
@@ -215,6 +217,8 @@ impl Engine {
             had_work: AtomicBool::new(false),
             awake: Mutex::new(None),
             speedtest_busy: AtomicBool::new(false),
+            endurance_stop: AtomicBool::new(false),
+            endurance_status: Mutex::new(None),
             bind_device: !opts.no_device_binding,
             fixed_ifaces,
             ping: Mutex::new(HashMap::new()),
