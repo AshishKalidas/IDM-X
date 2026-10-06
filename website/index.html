@@ -239,7 +239,7 @@
     <section class="section" id="download">
       <div class="head reveal">
         <p class="eyebrow">Download</p>
-        <h2>Get IDMX <span data-latest>0.1.0</span></h2>
+        <h2>Get IDMX <span data-latest>0.2.0</span></h2>
         <p class="sub" id="dl-sub">Free. No account. Pick your system.</p>
       </div>
       <div class="dls" id="dls"></div>
@@ -289,18 +289,32 @@
 
   <script type="application/json" id="release-data">
   {
-    "latest": "0.1.0",
+    "latest": "0.2.0",
     "downloads": {
-      "macos-arm64": { "label": "macOS", "sub": "Apple silicon (M1 and later)", "file": "downloads/IDMX-0.1.0-macos-arm64.dmg" },
-      "macos-x64":   { "label": "macOS", "sub": "Intel", "file": "downloads/IDMX-0.1.0-macos-x64.dmg" },
-      "windows":     { "label": "Windows", "sub": "Windows 10 and 11, 64-bit", "file": "downloads/IDMX-0.1.0-windows-x64-setup.exe" },
-      "linux":       { "label": "Linux", "sub": "AppImage, runs on most distros · x86-64", "file": "downloads/IDMX-0.1.0-linux-x64.AppImage" },
-      "cli-mac":     { "label": "CLI · macOS", "sub": "idmx for the terminal · Apple silicon", "file": "downloads/idmx-0.1.0-macos-arm64.tar.gz" },
-      "cli-mac-x64": { "label": "CLI · macOS", "sub": "idmx for the terminal · Intel", "file": "downloads/idmx-0.1.0-macos-x64.tar.gz" },
-      "cli-win":     { "label": "CLI · Windows", "sub": "idmx.exe", "file": "downloads/idmx-0.1.0-windows-x64.zip" },
-      "cli-linux":   { "label": "CLI · Linux", "sub": "x86-64", "file": "downloads/idmx-0.1.0-linux-x64.tar.gz" }
+      "macos-arm64": { "label": "macOS", "sub": "Apple silicon (M1 and later)", "file": "downloads/IDMX-0.2.0-macos-arm64.dmg" },
+      "macos-x64":   { "label": "macOS", "sub": "Intel", "file": "downloads/IDMX-0.2.0-macos-x64.dmg" },
+      "windows":     { "label": "Windows", "sub": "Windows 10 and 11, 64-bit", "file": "downloads/IDMX-0.2.0-windows-x64-setup.exe" },
+      "linux":       { "label": "Linux", "sub": "AppImage, runs on most distros · x86-64", "file": "downloads/IDMX-0.2.0-linux-x64.AppImage" },
+      "cli-mac":     { "label": "CLI · macOS", "sub": "idmx for the terminal · Apple silicon", "file": "downloads/idmx-0.2.0-macos-arm64.tar.gz" },
+      "cli-mac-x64": { "label": "CLI · macOS", "sub": "idmx for the terminal · Intel", "file": "downloads/idmx-0.2.0-macos-x64.tar.gz" },
+      "cli-win":     { "label": "CLI · Windows", "sub": "idmx.exe", "file": "downloads/idmx-0.2.0-windows-x64.zip" },
+      "cli-linux":   { "label": "CLI · Linux", "sub": "x86-64", "file": "downloads/idmx-0.2.0-linux-x64.tar.gz" }
     },
     "releases": [
+      {
+        "version": "0.2.0", "date": "2026-10-06", "title": "In-depth speed test",
+        "blurb": "Leave a speed test running for hours and get a log of what your connection really did.",
+        "groups": [
+          { "name": "New", "items": [
+            "In-depth speed test: downloads a 500 MB file over and over on each network until you stop it, logging speed, latency, jitter, lost probes and stalls every second",
+            "Press End and the log is saved as a CSV with a summary, and the live data is cleared; saved runs can be shown in the folder or deleted",
+            "Opening a .torrent file or magnet link now shows the Add sheet, so you can choose files and a folder first"
+          ]},
+          { "name": "Fixed", "items": [
+            "Torrent details no longer print a file path in the header or overlap the Peers row with the speed-comparison badge"
+          ]}
+        ]
+      },
       {
         "version": "0.1.0", "date": "2026-10-04", "title": "The first release",
         "blurb": "IDMX arrives: one engine that downloads over every network you have, with torrents, video and a browser extension.",
