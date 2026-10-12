@@ -239,7 +239,7 @@
     <section class="section" id="download">
       <div class="head reveal">
         <p class="eyebrow">Download</p>
-        <h2>Get IDMX <span data-latest>0.2.0</span></h2>
+        <h2>Get IDMX <span data-latest>0.2.1</span></h2>
         <p class="sub" id="dl-sub">Free. No account. Pick your system.</p>
       </div>
       <div class="dls" id="dls"></div>
@@ -289,18 +289,29 @@
 
   <script type="application/json" id="release-data">
   {
-    "latest": "0.2.0",
+    "latest": "0.2.1",
     "downloads": {
-      "macos-arm64": { "label": "macOS", "sub": "Apple silicon (M1 and later)", "file": "downloads/IDMX-0.2.0-macos-arm64.dmg" },
-      "macos-x64":   { "label": "macOS", "sub": "Intel", "file": "downloads/IDMX-0.2.0-macos-x64.dmg" },
-      "windows":     { "label": "Windows", "sub": "Windows 10 and 11, 64-bit", "file": "downloads/IDMX-0.2.0-windows-x64-setup.exe" },
-      "linux":       { "label": "Linux", "sub": "AppImage, runs on most distros · x86-64", "file": "downloads/IDMX-0.2.0-linux-x64.AppImage" },
-      "cli-mac":     { "label": "CLI · macOS", "sub": "idmx for the terminal · Apple silicon", "file": "downloads/idmx-0.2.0-macos-arm64.tar.gz" },
-      "cli-mac-x64": { "label": "CLI · macOS", "sub": "idmx for the terminal · Intel", "file": "downloads/idmx-0.2.0-macos-x64.tar.gz" },
-      "cli-win":     { "label": "CLI · Windows", "sub": "idmx.exe", "file": "downloads/idmx-0.2.0-windows-x64.zip" },
-      "cli-linux":   { "label": "CLI · Linux", "sub": "x86-64", "file": "downloads/idmx-0.2.0-linux-x64.tar.gz" }
+      "macos-arm64": { "label": "macOS", "sub": "Apple silicon (M1 and later)", "file": "downloads/IDMX-0.2.1-macos-arm64.dmg" },
+      "macos-x64":   { "label": "macOS", "sub": "Intel", "file": "downloads/IDMX-0.2.1-macos-x64.dmg" },
+      "windows":     { "label": "Windows", "sub": "Windows 10 and 11, 64-bit", "file": "downloads/IDMX-0.2.1-windows-x64-setup.exe" },
+      "linux":       { "label": "Linux", "sub": "AppImage, runs on most distros · x86-64", "file": "downloads/IDMX-0.2.1-linux-x64.AppImage" },
+      "cli-mac":     { "label": "CLI · macOS", "sub": "idmx for the terminal · Apple silicon", "file": "downloads/idmx-0.2.1-macos-arm64.tar.gz" },
+      "cli-mac-x64": { "label": "CLI · macOS", "sub": "idmx for the terminal · Intel", "file": "downloads/idmx-0.2.1-macos-x64.tar.gz" },
+      "cli-win":     { "label": "CLI · Windows", "sub": "idmx.exe", "file": "downloads/idmx-0.2.1-windows-x64.zip" },
+      "cli-linux":   { "label": "CLI · Linux", "sub": "x86-64", "file": "downloads/idmx-0.2.1-linux-x64.tar.gz" }
     },
     "releases": [
+      {
+        "version": "0.2.1", "date": "2026-10-12", "title": "Torrent fixes",
+        "blurb": "Torrents work on Windows, and adding one can no longer silently do nothing.",
+        "groups": [
+          { "name": "Fixed", "items": [
+            "Windows: torrents failed with “error creating bind device”. They now start normally (on Windows torrents use the system's network rather than being pinned to one)",
+            "Adding a torrent that is already in your list now says so, instead of quietly doing nothing",
+            "A torrent engine that is slow to start can no longer block every other torrent from being added"
+          ]}
+        ]
+      },
       {
         "version": "0.2.0", "date": "2026-10-06", "title": "In-depth speed test",
         "blurb": "Leave a speed test running for hours and get a log of what your connection really did.",
@@ -335,7 +346,7 @@
             "Streaming video (HLS/DASH) runs through yt-dlp on one network",
             "A single-file torrent can't be divided across networks",
             "Builds are unsigned; the extension loads unpacked until it is in the Chrome Web Store",
-            "Windows and Linux have been type-checked but not yet run on real machines",
+            "Windows and Linux builds are new and have had little real-world testing; torrents on Windows can't be pinned to one network",
             "Mobile apps are not available yet"
           ]}
         ]

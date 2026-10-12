@@ -22,7 +22,7 @@ impl Inner {
         // Only bind to a network that's actually up; otherwise the system chooses.
         let bind = t.network.clone().filter(|id| self.ifaces.read().iter().any(|i| &i.id == id && i.usable));
         torrent::SessionCfg {
-            bind_device: if self.bind_device { bind } else { None },
+            bind_device: if self.bind_device && torrent::CAN_BIND_DEVICE { bind } else { None },
             dht: t.dht,
             listen_port: t.listen_port,
             upload_bps: t.upload_limit.map(|v| v.min(u32::MAX as u64) as u32),
@@ -37,7 +37,7 @@ impl Inner {
     pub(crate) fn torrent_cfgs(&self) -> Vec<torrent::SessionCfg> {
         let base = self.torrent_cfg();
         let s = self.settings.read();
-        if !s.torrent.multi_network || s.torrent.network.is_some() || !self.bind_device || self.torrent_isolated {
+        if !s.torrent.multi_network || s.torrent.network.is_some() || !self.bind_device || !torrent::CAN_BIND_DEVICE || self.torrent_isolated {
             return vec![base];
         }
         let nets: Vec<String> = self.ifaces.read().iter().filter(|i| i.usable && s.interfaces.get(&i.id).and_then(|r| r.enabled).unwrap_or(i.kind.default_enabled())).map(|i| i.id.clone()).collect();

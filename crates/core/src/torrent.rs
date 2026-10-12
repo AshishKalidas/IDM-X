@@ -31,6 +31,11 @@ pub struct Group {
 pub type Handle = Arc<Group>;
 
 /// Split `files` (index, size) across `n` buckets so each carries about the same bytes.
+/// Whether the torrent engine can pin its traffic to one network device. It can't on Windows (devices
+/// there are named by GUID, and the engine has no way to bind to one), so torrents use the system's
+/// choice of network instead of failing.
+pub const CAN_BIND_DEVICE: bool = cfg!(not(windows));
+
 pub fn partition(files: &[(usize, u64)], n: usize) -> Vec<Vec<usize>> {
     let n = n.max(1);
     let mut order: Vec<&(usize, u64)> = files.iter().collect();
@@ -172,7 +177,7 @@ impl TorrentHub {
             dht: (cfg.dht && !cfg.isolated).then(|| librqbit::DhtSessionConfig { persistence: None, ..Default::default() }),
             disable_trackers: cfg.isolated,
             disable_local_service_discovery: cfg.isolated,
-            bind_device_name: cfg.bind_device.clone(),
+            bind_device_name: if CAN_BIND_DEVICE { cfg.bind_device.clone() } else { None },
             ipv4_only: true,
             fastresume: false,
             persistence: None,
@@ -182,7 +187,11 @@ impl TorrentHub {
             client_name_and_version: Some(concat!("IDMX/", env!("CARGO_PKG_VERSION")).into()),
             ..Default::default()
         };
-        let s = Session::new_with_opts(dir, opts).await.map_err(|e| Error::msg(format!("Couldn't start the torrent engine: {e}")))?;
+        // Bounded, because the hub lock is held meanwhile and every other torrent would queue behind a stuck start.
+        let s = tokio::time::timeout(Duration::from_secs(30), Session::new_with_opts(dir, opts))
+            .await
+            .map_err(|_| Error::msg("Couldn't start the torrent engine: it took too long. Try again."))?
+            .map_err(|e| Error::msg(format!("Couldn't start the torrent engine: {e}")))?;
         g.insert(cfg.bind_device.clone(), (cfg.clone(), s.clone()));
         Ok(s)
     }

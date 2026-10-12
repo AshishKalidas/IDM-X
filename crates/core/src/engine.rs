@@ -533,6 +533,7 @@ impl Engine {
                 j.url == it.url && j.dest_dir == dest && !j.status.is_finished()
             });
             if dup {
+                errors.push("That's already in your list.".into());
                 continue;
             }
             let mut options = req.options.clone();
