@@ -266,13 +266,32 @@ function Sheet() {
                   <div className="probe-main">
                     <b>{tor.meta.name}</b>
                     <span className="mono">
-                      {tor.meta.files.length} file{tor.meta.files.length === 1 ? '' : 's'} · {bytes(tor.meta.total)} · {picked.size} selected
+                      {tor.meta.files.length} file{tor.meta.files.length === 1 ? '' : 's'} ·{' '}
+                      {picked.size < tor.meta.files.length ? (
+                        <>
+                          <b>{bytes(tor.meta.files.filter((f) => picked.has(f.index)).reduce((a, f) => a + f.size, 0))}</b> of {bytes(tor.meta.total)} · {picked.size} selected
+                        </>
+                      ) : (
+                        <>
+                          {bytes(tor.meta.total)} · {picked.size} selected
+                        </>
+                      )}
                     </span>
                   </div>
                   <span className="badge ok">Torrent</span>
                 </div>
                 {tor.meta.files.length > 1 && (
-                  <div style={{ maxHeight: 160, overflow: 'auto', marginTop: 8 }}>
+                  <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 12 }}>
+                    <button style={{ color: 'var(--accent)' }} onClick={() => setPicked(new Set(tor.meta!.files.map((f) => f.index)))}>
+                      Select all
+                    </button>
+                    <button style={{ color: 'var(--accent)' }} onClick={() => setPicked(new Set())}>
+                      Select none
+                    </button>
+                  </div>
+                )}
+                {tor.meta.files.length > 1 && (
+                  <div style={{ maxHeight: 160, overflow: 'auto', marginTop: 4 }}>
                     {tor.meta.files.map((f) => (
                       <label key={f.index} style={{ display: 'flex', gap: 8, padding: '3px 0', fontSize: 12 }}>
                         <input

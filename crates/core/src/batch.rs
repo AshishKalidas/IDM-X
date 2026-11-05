@@ -37,7 +37,7 @@ pub fn expand_items(input: &str) -> Vec<Item> {
         if matches!(crate::torrent::Source::parse(t), Some(crate::torrent::Source::File(_))) {
             vec![t]
         } else {
-            l.split_whitespace().collect()
+            l.split_whitespace().filter_map(clean_token).collect()
         }
     }) {
         if matches!(crate::torrent::Source::parse(token), Some(crate::torrent::Source::File(_))) {
@@ -52,6 +52,24 @@ pub fn expand_items(input: &str) -> Vec<Item> {
         }
     }
     out
+}
+
+/// A pasted word with list decoration removed, or `None` if it was only decoration. Lists copied from
+/// web pages and notes come as `- https://…`, `1. https://…`, `* <https://…>` or `[name](https://…)`.
+fn clean_token(raw: &str) -> Option<&str> {
+    let mut t = raw;
+    // Markdown link: [text](url)
+    if let (Some(open), true) = (t.find("]("), t.ends_with(')')) {
+        t = &t[open + 2..t.len() - 1];
+    }
+    t = t.trim_matches(|c: char| matches!(c, '<' | '>' | '"' | '\'' | '`' | ',' | ';'));
+    let marker = t.chars().all(|c| matches!(c, '-' | '*' | '+' | '•' | '–' | '—' | '>' | '|'))
+        || (t.len() <= 4 && (t.ends_with('.') || t.ends_with(')')) && t[..t.len() - 1].chars().all(|c| c.is_ascii_digit()) && t.len() > 1);
+    if t.is_empty() || marker {
+        None
+    } else {
+        Some(t)
+    }
 }
 
 pub fn expand_pattern(s: &str) -> Vec<String> {
@@ -147,6 +165,12 @@ pub fn parse_metalink(xml: &str) -> Vec<MetalinkFile> {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn list_decoration_is_ignored() {
+        let v = expand("##Download links\n- https://a.test/x.part1.rar\n* <https://a.test/x.part2.rar>\n1. https://a.test/y\n[z](https://a.test/z)\n-");
+        assert_eq!(v, ["https://a.test/x.part1.rar", "https://a.test/x.part2.rar", "https://a.test/y", "https://a.test/z"]);
+    }
+
     #[test]
     fn a_torrent_file_path_with_spaces_is_one_item() {
         let d = std::env::temp_dir().join("idmx test dir [1]");

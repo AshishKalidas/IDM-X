@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { ArrowUpToLine, Copy, Folder, Pause, Play, RotateCcw, Trash2, X, MoreHorizontal, Clock } from 'lucide-react'
+import { ArrowUpToLine, Check, Copy, Folder, Pause, Play, RotateCcw, Trash2, X, MoreHorizontal, Clock } from 'lucide-react'
 import { useState } from 'react'
 import { api } from '../lib/api'
 import { bytes, eta, host, rate, ago, pct, clock } from '../lib/format'
@@ -38,7 +38,7 @@ export function StatusBadge({ job }: { job: Job }) {
   )
 }
 
-export default function DownloadCard({ job }: { job: Job }) {
+export default function DownloadCard({ job, checked = false, selecting = false, onCheck }: { job: Job; checked?: boolean; selecting?: boolean; onCheck?: (shift: boolean) => void }) {
   const selected = useStore((s) => s.selected === job.id)
   const select = useStore((s) => s.select)
   const interfaces = useStore((s) => s.interfaces)
@@ -61,14 +61,34 @@ export default function DownloadCard({ job }: { job: Job }) {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.16 } }}
         transition={{ type: 'spring', stiffness: 520, damping: 40 }}
-        className={`dl ${selected ? 'sel' : ''} ${job.status}`}
-        onClick={() => select(selected ? null : job.id)}
+        className={`dl ${selected ? 'sel' : ''} ${checked ? 'checked' : ''} ${selecting ? 'selecting' : ''} ${job.status}`}
+        onClick={(e) => {
+          // While picking several, a click on the row ticks it; ⌘/Ctrl/Shift-click always ticks.
+          if (onCheck && (selecting || e.metaKey || e.ctrlKey || e.shiftKey)) return onCheck(e.shiftKey)
+          select(selected ? null : job.id)
+        }}
         onContextMenu={(e) => {
           e.preventDefault()
           setMenu({ x: e.clientX, y: e.clientY })
         }}
       >
-        <FileGlyph name={job.fileName} />
+        <div className="dl-lead">
+          <FileGlyph name={job.fileName} />
+          {onCheck && (
+            <button
+              className="dl-check"
+              role="checkbox"
+              aria-checked={checked}
+              aria-label={checked ? 'Deselect' : 'Select'}
+              onClick={(e) => {
+                e.stopPropagation()
+                onCheck(e.shiftKey)
+              }}
+            >
+              <Check size={15} strokeWidth={3} />
+            </button>
+          )}
+        </div>
         <div className="dl-main">
           <div className="dl-top">
             <span className="dl-name">{name || job.fileName}</span>

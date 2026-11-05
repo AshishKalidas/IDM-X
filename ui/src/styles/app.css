@@ -130,6 +130,32 @@ html.tauri.mac .page-head { padding-top: 34px; }
 }
 .dl:hover { background: var(--fill-2); }
 .dl.sel { box-shadow: 0 0 0 1.5px var(--accent), 0 8px 30px color-mix(in srgb, var(--accent) 14%, transparent); background: var(--fill-2); }
+.dl.checked { box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--accent) 70%, transparent); background: color-mix(in srgb, var(--accent) 9%, var(--fill)); }
+
+/* pick several rows: a round tick replaces the file icon on hover, and stays while picking */
+.dl-lead { position: relative; width: 42px; height: 42px; }
+.dl-check {
+  position: absolute; inset: 0; margin: auto; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  color: transparent; background: var(--fill-2); box-shadow: inset 0 0 0 1.5px var(--line-strong); opacity: 0; transform: scale(0.8);
+  transition: opacity 0.15s, transform 0.2s var(--ease), background 0.15s, color 0.15s;
+}
+.dl-lead > :first-child { transition: opacity 0.15s; }
+.dl:hover .dl-check, .dl.selecting .dl-check, .dl.checked .dl-check { opacity: 1; transform: scale(1); }
+.dl:hover .dl-lead > :first-child, .dl.selecting .dl-lead > :first-child { opacity: 0; }
+.dl.checked .dl-check { background: var(--accent); color: #fff; box-shadow: none; }
+
+.dl-col { position: relative; }
+.bulk-bar {
+  position: absolute; left: 50%; bottom: 22px; translate: -50% 0; z-index: 20; display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px 8px 16px; border-radius: 999px; white-space: nowrap; max-width: calc(100% - 40px); overflow-x: auto;
+  background: color-mix(in srgb, var(--bg-elev, var(--bg)) 82%, transparent); -webkit-backdrop-filter: blur(24px) saturate(1.6); backdrop-filter: blur(24px) saturate(1.6);
+  box-shadow: 0 0 0 0.5px var(--line-strong), 0 14px 44px rgba(0, 0, 0, 0.35);
+}
+.bulk-count { font-size: 13px; color: var(--fg-2); display: flex; align-items: baseline; gap: 6px; }
+.bulk-count b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
+.bulk-count span { color: var(--accent); font-size: 12px; }
+.bulk-sep { width: 1px; height: 20px; background: var(--line-strong); margin: 0 4px; flex: none; }
+.dl-scroll { scroll-padding-bottom: 90px; }
 .dl-main { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
 .dl-top { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .dl-name { font-weight: 620; font-size: 15px; letter-spacing: -0.015em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
