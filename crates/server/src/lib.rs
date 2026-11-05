@@ -129,6 +129,7 @@ pub async fn serve(engine: Engine, cfg: ServeConfig) -> Result<ServerHandle> {
         .route("/extension/hello", post(extension_hello))
         .route("/torrent/stage", post(torrent_stage))
         .route("/pending-add", get(pending_add))
+        .route("/add-request", post(add_request))
         .route("/cache", get(cache_info))
         .route("/cache/clear", post(cache_clear))
         .route("/browser", get(browser_info))
@@ -743,6 +744,18 @@ async fn torrent_stage(State(app): State<App>, ConnectInfo(peer): ConnectInfo<So
 }
 
 /// Things the operating system asked IDMX to open, for the window's Add sheet.
+#[derive(Deserialize)]
+struct AddRequestBody {
+    text: String,
+}
+
+/// A browser extension found a torrent or magnet link: show the Add sheet so the user picks the
+/// files and the folder, instead of starting it blind in the default folder.
+async fn add_request(State(app): State<App>, Json(r): Json<AddRequestBody>) -> Json<Value> {
+    app.engine.request_add(r.text);
+    Json(json!({ "ok": true }))
+}
+
 async fn pending_add(State(app): State<App>) -> Json<Value> {
     Json(json!({ "items": app.engine.take_pending_add() }))
 }

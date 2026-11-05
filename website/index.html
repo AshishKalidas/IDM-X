@@ -239,7 +239,7 @@
     <section class="section" id="download">
       <div class="head reveal">
         <p class="eyebrow">Download</p>
-        <h2>Get IDMX <span data-latest>0.2.1</span></h2>
+        <h2>Get IDMX <span data-latest>0.2.2</span></h2>
         <p class="sub" id="dl-sub">Free. No account. Pick your system.</p>
       </div>
       <div class="dls" id="dls"></div>
@@ -289,18 +289,31 @@
 
   <script type="application/json" id="release-data">
   {
-    "latest": "0.2.1",
+    "latest": "0.2.2",
     "downloads": {
-      "macos-arm64": { "label": "macOS", "sub": "Apple silicon (M1 and later)", "file": "downloads/IDMX-0.2.1-macos-arm64.dmg" },
-      "macos-x64":   { "label": "macOS", "sub": "Intel", "file": "downloads/IDMX-0.2.1-macos-x64.dmg" },
-      "windows":     { "label": "Windows", "sub": "Windows 10 and 11, 64-bit", "file": "downloads/IDMX-0.2.1-windows-x64-setup.exe" },
-      "linux":       { "label": "Linux", "sub": "AppImage, runs on most distros · x86-64", "file": "downloads/IDMX-0.2.1-linux-x64.AppImage" },
-      "cli-mac":     { "label": "CLI · macOS", "sub": "idmx for the terminal · Apple silicon", "file": "downloads/idmx-0.2.1-macos-arm64.tar.gz" },
-      "cli-mac-x64": { "label": "CLI · macOS", "sub": "idmx for the terminal · Intel", "file": "downloads/idmx-0.2.1-macos-x64.tar.gz" },
-      "cli-win":     { "label": "CLI · Windows", "sub": "idmx.exe", "file": "downloads/idmx-0.2.1-windows-x64.zip" },
-      "cli-linux":   { "label": "CLI · Linux", "sub": "x86-64", "file": "downloads/idmx-0.2.1-linux-x64.tar.gz" }
+      "macos-arm64": { "label": "macOS", "sub": "Apple silicon (M1 and later)", "file": "downloads/IDMX-0.2.2-macos-arm64.dmg" },
+      "macos-x64":   { "label": "macOS", "sub": "Intel", "file": "downloads/IDMX-0.2.2-macos-x64.dmg" },
+      "windows":     { "label": "Windows", "sub": "Windows 10 and 11, 64-bit", "file": "downloads/IDMX-0.2.2-windows-x64-setup.exe" },
+      "linux":       { "label": "Linux", "sub": "AppImage, runs on most distros · x86-64", "file": "downloads/IDMX-0.2.2-linux-x64.AppImage" },
+      "cli-mac":     { "label": "CLI · macOS", "sub": "idmx for the terminal · Apple silicon", "file": "downloads/idmx-0.2.2-macos-arm64.tar.gz" },
+      "cli-mac-x64": { "label": "CLI · macOS", "sub": "idmx for the terminal · Intel", "file": "downloads/idmx-0.2.2-macos-x64.tar.gz" },
+      "cli-win":     { "label": "CLI · Windows", "sub": "idmx.exe", "file": "downloads/idmx-0.2.2-windows-x64.zip" },
+      "cli-linux":   { "label": "CLI · Linux", "sub": "x86-64", "file": "downloads/idmx-0.2.2-linux-x64.tar.gz" }
     },
     "releases": [
+      {
+        "version": "0.2.2", "date": "2026-11-05", "title": "Select several downloads",
+        "blurb": "Pause, remove or delete a batch of downloads in one go, and pasted lists just work.",
+        "groups": [
+          { "name": "New", "items": [
+            "Select several downloads: tick the circle on a row (shift-click for a range, ⌘/Ctrl-A for all) and a bar appears to pause, resume, remove from the list, or delete with files",
+            "Adding a torrent: the size shown now follows the files you tick, with Select all and Select none"
+          ]},
+          { "name": "Fixed", "items": [
+            "Pasting a bulleted or numbered list, or markdown links, no longer fails with “doesn't look like a web address”"
+          ]}
+        ]
+      },
       {
         "version": "0.2.1", "date": "2026-10-12", "title": "Torrent fixes",
         "blurb": "Torrents work on Windows, and adding one can no longer silently do nothing.",

@@ -49,8 +49,14 @@ function notify(title, message) {
 }
 
 /** Hand something to IDMX. `media` makes it resolve the page/stream with yt-dlp. */
-async function send(url, { referer, media, quiet, mediaFormat } = {}) {
+async function send(url, { referer, media, quiet, mediaFormat, torrent } = {}) {
   try {
+    // Torrents open IDMX's Add sheet, so you choose the files and the folder rather than it starting blind.
+    if (torrent || IDMX.isMagnet(url) || IDMX.isTorrentDownload(url)) {
+      await api('/add-request', { method: 'POST', body: JSON.stringify({ text: url }) })
+      if (!quiet) notify('Opened in IDMX', 'Choose the files and folder to start it.')
+      return true
+    }
     const jobs = await api('/jobs', {
       method: 'POST',
       body: JSON.stringify({
@@ -150,7 +156,7 @@ chrome.downloads.onCreated.addListener(async (item) => {
   if (!/^https?:/i.test(url) || item.byExtensionId) return
   const torrent = IDMX.isTorrentDownload(url, item.mime)
   if (!torrent && (!c.takeOver || (item.fileSize > 0 && item.fileSize < c.minSize))) return
-  if (await send(url, { referer: item.referrer })) {
+  if (await send(url, { referer: item.referrer, torrent })) {
     chrome.downloads.cancel(item.id)
     chrome.downloads.erase({ id: item.id })
   }
