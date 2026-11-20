@@ -251,6 +251,8 @@ pub struct JobOptions {
     pub scheduled_window: bool,
     /// Skip post-download rules.
     pub skip_post: bool,
+    /// Start now: ignore the active-download limit and the schedule window.
+    pub force_start: bool,
     /// Torrent: which files to fetch (indexes). `None` = all.
     pub torrent_files: Option<Vec<u32>>,
     /// Treat the link as a page with video on it and resolve it with yt-dlp.

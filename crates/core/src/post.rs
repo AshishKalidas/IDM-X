@@ -33,6 +33,18 @@ pub fn rule_matches(m: &RuleMatch, job: &Job, name: &str) -> bool {
     true
 }
 
+/// Where a new download should be written so a matching "move to" rule has nothing left to move:
+/// the folder of the first enabled rule that matches and begins with a move.
+pub fn route_dir(rules: &[PostRule], job: &Job, name: &str) -> Option<PathBuf> {
+    rules
+        .iter()
+        .filter(|r| r.enabled && rule_matches(&r.when, job, name))
+        .find_map(|r| match r.actions.first() {
+            Some(PostAction::MoveTo { dir }) => Some(PathBuf::from(expand_template(dir, job, name))),
+            _ => None,
+        })
+}
+
 /// `{ext} {host} {year} {month} {date} {name} {stem}` and a leading `~`.
 pub fn expand_template(t: &str, job: &Job, name: &str) -> String {
     let now = chrono::Local::now();
@@ -97,6 +109,10 @@ async fn run_action(a: &PostAction, job: &Job, path: &Path, sha256: Option<&str>
     match a {
         PostAction::MoveTo { dir } => {
             let dest_dir = PathBuf::from(expand_template(dir, job, &name));
+            // Already written straight into that folder: nothing to move.
+            if path.parent().is_some_and(|p| p == dest_dir) {
+                return Ok(ActionResult { note: None, new_path: None });
+            }
             let (p, d) = (path.to_path_buf(), dest_dir.clone());
             let moved = tokio::task::spawn_blocking(move || move_file(&p, &d)).await.map_err(|e| e.to_string())??;
             Ok(ActionResult { note: Some(format!("  → moved to {}", moved.display())), new_path: Some(moved) })

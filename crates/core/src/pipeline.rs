@@ -180,6 +180,21 @@ impl Inner {
         }
 
         // ── 3. name it, find it a place ──
+        // A "move to" rule would otherwise download into the default folder and copy the finished file
+        // across afterwards. When the user didn't pick a folder themselves, download straight into the
+        // rule's folder instead, so nothing is written on the wrong drive.
+        if (first_time || prior.0.is_none()) && !opts.skip_post {
+            let wanted = opts.file_name.clone().map(|n| crate::util::sanitize_filename(&n)).unwrap_or(info.file_name.clone());
+            let routed = {
+                let mut j = entry.job.lock().clone();
+                j.size = info.size;
+                (j.dest_dir == settings.download_dir).then(|| crate::post::route_dir(&settings.post_rules, &j, &wanted)).flatten()
+            };
+            if let Some(dir) = routed {
+                let dir = dir.to_string_lossy().into_owned();
+                self.update(entry, |j| j.dest_dir = dir);
+            }
+        }
         let dest = PathBuf::from(&entry.job.lock().dest_dir);
         std::fs::create_dir_all(&dest).map_err(|e| Error::msg(format!("Can't save to “{}”: {}", dest.display(), crate::error::io_message(&e))))?;
         if first_time || prior.0.is_none() {

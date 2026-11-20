@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { Check, ChevronDown, Copy, ExternalLink, Folder, Pause, Play, RotateCcw, Trash2, X, ShieldCheck, ShieldAlert } from 'lucide-react'
+import { Check, ChevronDown, Copy, ExternalLink, Folder, Pause, Play, RotateCcw, Trash2, X, ShieldCheck, ShieldAlert, Zap, RefreshCw, ScanSearch } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../lib/api'
 import { bytes, duration, eta, rate, pct, host } from '../lib/format'
@@ -316,6 +316,21 @@ export default function Inspector({ job }: { job: Job }) {
         {(job.status === 'paused' || job.status === 'failed' || job.status === 'cancelled') && (
           <Button variant="primary" icon={job.status === 'paused' ? <Play size={15} /> : <RotateCcw size={15} />} onClick={() => act(() => api.resume(job.id))}>
             {job.status === 'paused' ? 'Resume' : 'Retry'}
+          </Button>
+        )}
+        {!done && !running && !job.options.forceStart && (
+          <Button variant="glass" icon={<Zap size={15} />} onClick={() => act(() => api.forceStart(job.id))}>
+            Force start
+          </Button>
+        )}
+        {job.kind === 'torrent' && !done && running && (
+          <Button variant="glass" icon={<RefreshCw size={15} />} onClick={() => act(() => api.torrentRefresh(job.id))}>
+            Find more peers
+          </Button>
+        )}
+        {job.kind === 'torrent' && (
+          <Button variant="glass" icon={<ScanSearch size={15} />} onClick={() => act(() => api.torrentRecheck(job.id))}>
+            Recheck files
           </Button>
         )}
         {done && (

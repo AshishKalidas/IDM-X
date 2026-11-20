@@ -73,6 +73,7 @@ export interface JobOptions {
   fileName?: string | null
   scheduledWindow?: boolean
   skipPost?: boolean
+  forceStart?: boolean
   torrentFiles?: number[] | null
   media?: boolean | null
   mediaFormat?: string | null

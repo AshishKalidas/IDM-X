@@ -638,6 +638,62 @@ impl Engine {
         Ok(())
     }
 
+    /// Start right now, past the active-download limit and the schedule window.
+    pub fn force_start(&self, id: &str) -> Result<()> {
+        let e = self.inner.find(id).ok_or(Error::NotFound)?;
+        self.inner.update(&e, |j| {
+            j.options.force_start = true;
+            if matches!(j.status, JobStatus::Paused | JobStatus::Failed | JobStatus::Cancelled) {
+                j.status = JobStatus::Queued;
+                j.error = None;
+            }
+            j.start_at = None;
+        });
+        self.inner.kick.notify_one();
+        Ok(())
+    }
+
+    /// Torrent: ask trackers and DHT for peers again. Pausing and unpausing the torrent starts fresh announces.
+    pub async fn torrent_refresh_peers(&self, id: &str) -> Result<()> {
+        let e = self.inner.find(id).ok_or(Error::NotFound)?;
+        let h = e.ctl.lock().torrent.clone().ok_or_else(|| Error::msg("Start the torrent first, then look for more peers."))?;
+        self.inner.torrents.pause(&h).await?;
+        self.inner.torrents.unpause(&h).await?;
+        self.inner.update(&e, |j| j.log.push("Asked trackers and the swarm for more peers".into()));
+        Ok(())
+    }
+
+    /// Torrent: check the files on disk against the torrent again, then carry on with what is missing.
+    pub async fn torrent_recheck(&self, id: &str) -> Result<()> {
+        let e = self.inner.find(id).ok_or(Error::NotFound)?;
+        if e.job.lock().kind != JobKind::Torrent {
+            return Err(Error::msg("Only torrents can be rechecked."));
+        }
+        self.inner.stop_entry(&e, Want::Pause);
+        for _ in 0..50 {
+            if !e.ctl.lock().running {
+                break;
+            }
+            tokio::time::sleep(Duration::from_millis(100)).await;
+        }
+        if e.ctl.lock().running {
+            return Err(Error::msg("The torrent is still stopping. Try again in a moment."));
+        }
+        // Forget the engine's copy (keeping the files); starting again re-adds it and checks every piece.
+        let old = e.ctl.lock().torrent.take();
+        if let Some(h) = old {
+            self.inner.torrents.remove(&h, false).await?;
+        }
+        self.inner.update(&e, |j| {
+            j.status = JobStatus::Queued;
+            j.error = None;
+            j.start_at = None;
+            j.log.push("Rechecking files".into());
+        });
+        self.inner.kick.notify_one();
+        Ok(())
+    }
+
     pub fn pause_all(&self) {
         for e in self.inner.entries() {
             let st = e.job.lock().status;
@@ -1386,10 +1442,11 @@ impl Inner {
         let mut used = 0u32;
         let mut busy = false;
         let mut eligible: Vec<(i32, i64, Arc<JobEntry>)> = Vec::new();
+        let mut force_now: Vec<Arc<JobEntry>> = Vec::new();
         for e in self.entries() {
-            let (st, win, start_at, prio, created) = {
+            let (st, win, start_at, prio, created, forced) = {
                 let j = e.job.lock();
-                (j.status, j.options.scheduled_window, j.start_at, j.priority, j.created_at)
+                (j.status, j.options.scheduled_window, j.start_at, j.priority, j.created_at, j.options.force_start)
             };
             match st {
                 JobStatus::Probing | JobStatus::Downloading => {
@@ -1402,12 +1459,19 @@ impl Inner {
                         used += 1;
                     }
                     busy = true;
-                    if win && !in_window {
+                    if win && !in_window && !forced {
                         self.stop_entry(&e, Want::Requeue);
                     }
                 }
                 JobStatus::Verifying | JobStatus::Processing => busy = true,
                 JobStatus::Queued => {
+                    if forced {
+                        // Forced jobs start whatever the limit or the schedule says.
+                        busy = true;
+                        used += 1;
+                        force_now.push(e);
+                        continue;
+                    }
                     let ready = start_at.is_none_or(|t| t <= now) && (!win || in_window);
                     if ready {
                         busy = true;
@@ -1422,6 +1486,9 @@ impl Inner {
         // failing one by one, and go as soon as a network is back.
         let online = self.ifaces.read().iter().any(|i| i.usable);
         if online {
+            for e in force_now {
+                self.spawn_job(e);
+            }
             for (_, _, e) in eligible.into_iter().take(s.max_concurrent_jobs.saturating_sub(used) as usize) {
                 self.spawn_job(e);
             }

@@ -130,6 +130,9 @@ pub async fn serve(engine: Engine, cfg: ServeConfig) -> Result<ServerHandle> {
         .route("/torrent/stage", post(torrent_stage))
         .route("/pending-add", get(pending_add))
         .route("/add-request", post(add_request))
+        .route("/jobs/{id}/force-start", post(force_start))
+        .route("/jobs/{id}/torrent-refresh", post(torrent_refresh))
+        .route("/jobs/{id}/torrent-recheck", post(torrent_recheck))
         .route("/cache", get(cache_info))
         .route("/cache/clear", post(cache_clear))
         .route("/browser", get(browser_info))
@@ -754,6 +757,21 @@ struct AddRequestBody {
 async fn add_request(State(app): State<App>, Json(r): Json<AddRequestBody>) -> Json<Value> {
     app.engine.request_add(r.text);
     Json(json!({ "ok": true }))
+}
+
+async fn force_start(State(app): State<App>, Path(id): Path<String>) -> Res<Json<Value>> {
+    app.engine.force_start(&id)?;
+    Ok(Json(json!({ "ok": true })))
+}
+
+async fn torrent_refresh(State(app): State<App>, Path(id): Path<String>) -> Res<Json<Value>> {
+    app.engine.torrent_refresh_peers(&id).await?;
+    Ok(Json(json!({ "ok": true })))
+}
+
+async fn torrent_recheck(State(app): State<App>, Path(id): Path<String>) -> Res<Json<Value>> {
+    app.engine.torrent_recheck(&id).await?;
+    Ok(Json(json!({ "ok": true })))
 }
 
 async fn pending_add(State(app): State<App>) -> Json<Value> {
